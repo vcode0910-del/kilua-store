@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store Hosting - Otomatis</title>
+    
+    <!-- Library Eksternal -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Midtrans Snap.js (Ganti ke sandbox untuk testing) -->
+    <script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="YOUR_CLIENT_KEY"></script>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">Host<span>Geniuz</span></div>
+        <div class="menu">
+            <a href="#">Home</a>
+            <a href="#">Produk</a>
+            <button class="btn-login">Login</button>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <h1 data-aos="fade-down">Cloud Hosting Premium</h1>
+        <p data-aos="fade-up">Aktivasi otomatis dalam hitungan detik setelah pembayaran.</p>
+    </header>
+
+    <div class="container">
+        <!-- Card Produk -->
+        <div class="card" data-aos="zoom-in" data-aos-delay="100">
+            <div class="badge">Best Seller</div>
+            <i class="fas fa-rocket icon-float"></i>
+            <h3>Starter Pack</h3>
+            <div class="price">Rp 25.000 <span>/bln</span></div>
+            <ul>
+                <li><i class="fas fa-check"></i> 10GB SSD Storage</li>
+                <li><i class="fas fa-check"></i> Unlimited Bandwidth</li>
+                <li><i class="fas fa-check"></i> Free SSL Certificate</li>
+            </ul>
+            <button class="btn-buy" onclick="bayarOtomatis('starter_cloud')">
+                <i class="fas fa-shopping-cart"></i> Beli Sekarang
+            </button>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
