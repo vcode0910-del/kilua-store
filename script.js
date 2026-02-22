@@ -1,68 +1,123 @@
-AOS.init();
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-// KONFIGURASI PTERODACTYL (PTLA)
-const PTERO_URL = "https://panel.kamu.com";
-const PTERO_KEY = "ptla_XXXXXXXXXXXX"; // Hati-hati: Key ini terlihat di browser!
+// 1. GANTI DENGAN CONFIG FIREBASE KAMU
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_AUTH_DOMAIN",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_STORAGE_BUCKET",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+};
 
-// Inisialisasi Data dari LocalStorage
-let products = JSON.parse(localStorage.getItem('products')) || [];
-let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
-let users = JSON.parse(localStorage.getItem('users')) || [{username: 'admin', pass: 'admin123', role: 'admin'}];
-let currentUser = null;
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
 
-// Routing Sederhana
-function showPage(pageId) {
+// --- NAVIGATION SYSTEM ---
+window.showPage = (pageId) => {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById('page-' + pageId).classList.add('active');
-}
+};
 
-// Register & Login
-function register() {
-    const u = document.getElementById('reg-user').value;
-    const p = document.getElementById('reg-pass').value;
-    const r = document.getElementById('reg-role').value;
-    users.push({username: u, pass: p, role: r});
-    localStorage.setItem('users', JSON.stringify(users));
-    alert("Berhasil Daftar! Silahkan Login.");
-    showPage('login');
-}
-
-function login() {
-    const u = document.getElementById('login-user').value;
-    const p = document.getElementById('login-pass').value;
-    const user = users.find(x => x.username === u && x.pass === p);
-    
-    if(user) {
-        currentUser = user;
-        document.getElementById('auth-links').style.display = 'none';
-        document.getElementById('user-links').style.display = 'block';
-        if(user.role === 'admin') document.getElementById('admin-btn').style.display = 'inline';
-        alert("Welcome " + u);
-        showPage('home');
-    } else {
-        alert("User tidak ditemukan!");
-    }
-}
-
-function logout() {
-    currentUser = null;
-    location.reload();
-}
-
-// Admin Logic
-function addProduct() {
-    const newP = {
-        id: Date.now(),
+// --- DATABASE: PRODUK ---
+window.saveProduct = async () => {
+    const pData = {
         name: document.getElementById('p-name').value,
         price: document.getElementById('p-price').value,
         cpu: document.getElementById('p-cpu').value,
         ram: document.getElementById('p-ram').value,
-        disk: document.getElementById('p-disk').value
+        disk: document.getElementById('p-disk').value,
+        createdAt: new Date()
     };
-    products.push(newP);
-    localStorage.setItem('products', JSON.stringify(products));
-    renderProducts();
-    alert("Produk Berhasil Ditambah!");
+    await addDoc(collection(db, "products"), pData);
+    alert("Produk tersimpan di Database!");
+};
+
+// Real-time Update Produk ke Halaman Depan
+onSnapshot(collection(db, "products"), (snapshot) => {
+    const container = document.getElementById('product-container');
+    container.innerHTML = "";
+    snapshot.forEach(doc => {
+        const p = doc.data();
+        container.innerHTML += `
+            <div class="card">
+                <h3>${p.name}</h3>
+                <h2 style="color:#9b59b6">Rp ${Number(p.price).toLocaleString()}</h2>
+                <p>CPU: ${p.cpu}% | RAM: ${p.ram}MB</p>
+                <button class="btn-buy" onclick="processOrder('${p.name}', ${p.price})">Beli Sekarang</button>
+            </div>
+        `;
+    });
+});
+
+// --- DATABASE: ORDER/TRANSAKSI ---
+window.processOrder = async (pName, pPrice) => {
+    const user = auth.currentUser;
+    if(!user) return alert("Silahkan login dulu!");
+
+    const orderData = {
+        email: user.email,
+        product: pName,
+        price: pPrice,
+        status: "Success (Paid)",
+        date: new Date().toLocaleString()
+    };
+    await addDoc(collection(db, "orders"), orderData);
+    alert("Pembayaran Berhasil! Server Pterodactyl sedang dibuat otomatis.");
+};
+
+// Load Order ke Admin Panel
+onSnapshot(collection(db, "orders"), (snapshot) => {
+    const list = document.getElementById('order-list');
+    list.innerHTML = "";
+    snapshot.forEach(doc => {
+        const o = doc.data();
+        list.innerHTML += `
+            <div class="order-item">
+                <b>${o.email}</b> membelii <b>${o.product}</b><br>
+                <small>${o.date} - Status: ${o.status}</small>
+            </div>
+        `;
+    });
+});
+
+// --- AUTH SYSTEM (DATABASE AKUN) ---
+window.handleRegister = () => {
+    const email = document.getElementById('reg-email').value;
+    const pass = document.getElementById('reg-pass').value;
+    createUserWithEmailAndPassword(auth, email, pass)
+        .then(() => alert("Akun berhasil dibuat!"))
+        .catch(err => alert(err.message));
+};
+
+window.handleLogin = () => {
+    const email = document.getElementById('login-email').value;
+    const pass = document.getElementById('login-pass').value;
+    signInWithEmailAndPassword(auth, email, pass)
+        .then(() => {
+            alert("Login Berhasil!");
+            showPage('home');
+        })
+        .catch(err => alert(err.message));
+};
+
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        document.getElementById('auth-buttons').style.display = 'none';
+        document.getElementById('user-controls').style.display = 'block';
+        if(user.email === "admin@killua.com") { // Ganti dengan email admin kamu
+            document.getElementById('admin-link').style.display = 'inline';
+        }
+    } else {
+        document.getElementById('auth-buttons').style.display = 'block';
+        document.getElementById('user-controls').style.display = 'none';
+    }
+});
+
+window.logout = () => signOut(auth).then(() => location.reload());    alert("Produk Berhasil Ditambah!");
 }
 
 function renderProducts() {
