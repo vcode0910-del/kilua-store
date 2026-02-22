@@ -1,0 +1,10 @@
+<?php
+session_start();
+$conn = mysqli_connect("localhost", "root", "", "killua_db");
+
+// KONFIGURASI PTERODACTYL (PTLA)
+$ptero_url = "https://zenncloud.galaxyhost.biz.id"; 
+$ptero_api = "ptla_fEWom9BcpxhiOLVafdIUN7ZVjFcXd17NKcMn3LtEtel"; 
+
+if (!$conn) { die("Koneksi Database Gagal."); }
+?>
