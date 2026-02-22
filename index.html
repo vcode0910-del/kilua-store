@@ -3,50 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Store Hosting - Otomatis</title>
-    
-    <!-- Library Eksternal -->
+    <title>Killua Store</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Font & Icon -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <!-- Midtrans Snap.js (Ganti ke sandbox untuk testing) -->
-    <script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="YOUR_CLIENT_KEY"></script>
 </head>
 <body>
 
+    <!-- Navbar -->
     <nav class="navbar">
-        <div class="logo">Host<span>Geniuz</span></div>
-        <div class="menu">
-            <a href="#">Home</a>
-            <a href="#">Produk</a>
-            <button class="btn-login">Login</button>
+        <div class="logo">Killua <span>Store</span></div>
+        <div class="nav-links">
+            <button onclick="showPage('home')">Home</button>
+            <span id="auth-links">
+                <button onclick="showPage('login')">Login</button>
+                <button class="btn-primary" onclick="showPage('register')">Register</button>
+            </span>
+            <span id="user-links" style="display:none;">
+                <button id="admin-btn" onclick="showPage('admin')" style="display:none;">Admin</button>
+                <button class="btn-danger" onclick="logout()">Logout</button>
+            </span>
         </div>
     </nav>
 
-    <header class="hero">
-        <h1 data-aos="fade-down">Cloud Hosting Premium</h1>
-        <p data-aos="fade-up">Aktivasi otomatis dalam hitungan detik setelah pembayaran.</p>
-    </header>
-
-    <div class="container">
-        <!-- Card Produk -->
-        <div class="card" data-aos="zoom-in" data-aos-delay="100">
-            <div class="badge">Best Seller</div>
-            <i class="fas fa-rocket icon-float"></i>
-            <h3>Starter Pack</h3>
-            <div class="price">Rp 25.000 <span>/bln</span></div>
-            <ul>
-                <li><i class="fas fa-check"></i> 10GB SSD Storage</li>
-                <li><i class="fas fa-check"></i> Unlimited Bandwidth</li>
-                <li><i class="fas fa-check"></i> Free SSL Certificate</li>
-            </ul>
-            <button class="btn-buy" onclick="bayarOtomatis('starter_cloud')">
-                <i class="fas fa-shopping-cart"></i> Beli Sekarang
-            </button>
+    <!-- Page: Home -->
+    <section id="page-home" class="page active">
+        <div class="hero">
+            <h1 data-aos="fade-up">Killua Store</h1>
+            <p data-aos="fade-up" data-aos-delay="200">Pterodactyl Panel Otomatis & Hosting Terpercaya</p>
         </div>
-    </div>
+        <div class="container">
+            <div id="product-list" class="grid-products">
+                <!-- Produk akan muncul di sini via Script -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Page: Login -->
+    <section id="page-login" class="page">
+        <div class="form-box">
+            <h2>Login</h2>
+            <input type="text" id="login-user" placeholder="Username">
+            <input type="password" id="login-pass" placeholder="Password">
+            <button class="btn-buy" onclick="login()">Login</button>
+        </div>
+    </section>
+
+    <!-- Page: Register -->
+    <section id="page-register" class="page">
+        <div class="form-box">
+            <h2>Register</h2>
+            <input type="text" id="reg-user" placeholder="Username">
+            <input type="password" id="reg-pass" placeholder="Password">
+            <select id="reg-role">
+                <option value="user">User Biasa</option>
+                <option value="reseller">Reseller</option>
+            </select>
+            <button class="btn-buy" onclick="register()">Daftar</button>
+        </div>
+    </section>
+
+    <!-- Page: Admin Dashboard -->
+    <section id="page-admin" class="page">
+        <div class="container">
+            <h2>Admin Dashboard</h2>
+            <div class="admin-grid">
+                <div class="card">
+                    <h3>Tambah Produk</h3>
+                    <input type="text" id="p-name" placeholder="Nama Produk">
+                    <input type="number" id="p-price" placeholder="Harga">
+                    <input type="number" id="p-cpu" placeholder="CPU (%)">
+                    <input type="number" id="p-ram" placeholder="RAM (MB)">
+                    <input type="number" id="p-disk" placeholder="Disk (MB)">
+                    <button class="btn-buy" onclick="addProduct()">Simpan Produk</button>
+                </div>
+                <div class="card">
+                    <h3>Semua Transaksi</h3>
+                    <div id="transaction-history"></div>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="SET_YOUR_CLIENT_KEY"></script>
     <script src="script.js"></script>
 </body>
 </html>
