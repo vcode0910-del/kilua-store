@@ -1,10 +1,20 @@
 <?php
 session_start();
-$conn = mysqli_connect("localhost", "root", "", "killua_db");
+
+// Gunakan Environment Variables (Disarankan) atau isi langsung untuk tes
+$host = "147.139.244.154"; // Contoh: mysql-killua.aivencloud.com
+$user = "u1_ayH5Q2qDiq";
+$pass = "9fh^dGS50Z@z2Vttx@iErz9x";
+$db   = "s1_Killua";
+$port = "3306"; // Biasanya 3306 atau sesuai penyedia
+
+$conn = mysqli_connect($host, $user, $pass, $db, $port);
 
 // KONFIGURASI PTERODACTYL (PTLA)
 $ptero_url = "https://zenncloud.galaxyhost.biz.id"; 
 $ptero_api = "ptla_fEWom9BcpxhiOLVafdIUN7ZVjFcXd17NKcMn3LtEtel"; 
 
-if (!$conn) { die("Koneksi Database Gagal."); }
+if (!$conn) {
+    die("Koneksi Database Gagal: " . mysqli_connect_error());
+}
 ?>
